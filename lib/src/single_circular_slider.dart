@@ -67,6 +67,8 @@ class SingleCircularSlider extends StatefulWidget {
   /// otherwise, everytime the user completes a full lap, the selection restarts from 0
   final bool? shouldCountLaps;
 
+  final int? lap;
+
   SingleCircularSlider(
     this.divisions,
     this.position, {
@@ -85,10 +87,9 @@ class SingleCircularSlider extends StatefulWidget {
     this.showHandlerOutter,
     this.sliderStrokeWidth,
     this.shouldCountLaps,
-  })  : assert(position >= 0 && position <= divisions,
-            'init has to be > 0 and < divisions value'),
-        assert(divisions >= 0 && divisions <= 300,
-            'divisions has to be > 0 and <= 300');
+    this.lap,
+  })  : assert(position >= 0 && position <= divisions, 'init has to be > 0 and < divisions value'),
+        assert(divisions >= 0 && divisions <= 300, 'divisions has to be > 0 and <= 300');
 
   @override
   _SingleCircularSliderState createState() => _SingleCircularSliderState();
@@ -131,13 +132,13 @@ class _SingleCircularSliderState extends State<SingleCircularSlider> {
           },
           sliderStrokeWidth: widget.sliderStrokeWidth ?? 12.0,
           baseColor: widget.baseColor ?? Color.fromRGBO(255, 255, 255, 0.1),
-          selectionColor:
-              widget.selectionColor ?? Color.fromRGBO(255, 255, 255, 0.3),
+          selectionColor: widget.selectionColor ?? Color.fromRGBO(255, 255, 255, 0.3),
           handlerColor: widget.handlerColor ?? Colors.white,
           handlerOutterRadius: widget.handlerOutterRadius ?? 12.0,
           showRoundedCapInSelection: widget.showRoundedCapInSelection ?? false,
           showHandlerOutter: widget.showHandlerOutter ?? true,
           shouldCountLaps: widget.shouldCountLaps ?? false,
+          lap: widget.lap ?? 0,
         ));
   }
 }

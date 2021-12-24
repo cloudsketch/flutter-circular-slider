@@ -29,26 +29,27 @@ class CircularSliderPaint extends StatefulWidget {
   late final bool showHandlerOutter;
   late final double sliderStrokeWidth;
   late final bool shouldCountLaps;
+  late final int lap;
 
-  CircularSliderPaint({
-    required this.mode,
-    required this.divisions,
-    required this.init,
-    required this.end,
-    required this.child,
-    required this.primarySectors,
-    required this.secondarySectors,
-    required this.onSelectionChange,
-    required this.onSelectionEnd,
-    required this.baseColor,
-    required this.selectionColor,
-    required this.handlerColor,
-    required this.handlerOutterRadius,
-    required this.showRoundedCapInSelection,
-    required this.showHandlerOutter,
-    required this.sliderStrokeWidth,
-    required this.shouldCountLaps,
-  });
+  CircularSliderPaint(
+      {required this.mode,
+      required this.divisions,
+      required this.init,
+      required this.end,
+      required this.child,
+      required this.primarySectors,
+      required this.secondarySectors,
+      required this.onSelectionChange,
+      required this.onSelectionEnd,
+      required this.baseColor,
+      required this.selectionColor,
+      required this.handlerColor,
+      required this.handlerOutterRadius,
+      required this.showRoundedCapInSelection,
+      required this.showHandlerOutter,
+      required this.sliderStrokeWidth,
+      required this.shouldCountLaps,
+      required this.lap});
 
   @override
   _CircularSliderState createState() => _CircularSliderState();
@@ -84,15 +85,14 @@ class _CircularSliderState extends State<CircularSliderPaint> {
 
   bool get isSingleHandler => widget.mode == CircularSliderMode.singleHandler;
 
-  bool get isBothHandlersSelected =>
-      _isEndHandlerSelected && _isInitHandlerSelected;
+  bool get isBothHandlersSelected => _isEndHandlerSelected && _isInitHandlerSelected;
 
-  bool get isNoHandlersSelected =>
-      !_isEndHandlerSelected && !_isInitHandlerSelected;
+  bool get isNoHandlersSelected => !_isEndHandlerSelected && !_isInitHandlerSelected;
 
   @override
   void initState() {
     super.initState();
+    this._laps = widget.lap;
     _calculatePaintData();
   }
 
@@ -110,13 +110,12 @@ class _CircularSliderState extends State<CircularSliderPaint> {
   Widget build(BuildContext context) {
     return RawGestureDetector(
       gestures: <Type, GestureRecognizerFactory>{
-        CustomPanGestureRecognizer:
-            GestureRecognizerFactoryWithHandlers<CustomPanGestureRecognizer>(
+        CustomPanGestureRecognizer: GestureRecognizerFactoryWithHandlers<CustomPanGestureRecognizer>(
           () => CustomPanGestureRecognizer(
-                onPanDown: _onPanDown,
-                onPanUpdate: _onPanUpdate,
-                onPanEnd: _onPanEnd,
-              ),
+            onPanDown: _onPanDown,
+            onPanUpdate: _onPanUpdate,
+            onPanEnd: _onPanEnd,
+          ),
           (CustomPanGestureRecognizer instance) {},
         ),
       },
@@ -138,9 +137,7 @@ class _CircularSliderState extends State<CircularSliderPaint> {
   }
 
   void _calculatePaintData() {
-    var initPercent = isDoubleHandler
-        ? valueToPercentage(widget.init, widget.divisions)
-        : 0.0;
+    var initPercent = isDoubleHandler ? valueToPercentage(widget.init, widget.divisions) : 0.0;
     var endPercent = valueToPercentage(widget.end, widget.divisions);
     var sweep = getSweepAngle(initPercent, endPercent);
 
@@ -155,20 +152,13 @@ class _CircularSliderState extends State<CircularSliderPaint> {
     if (widget.shouldCountLaps) {
       var newSlidingState = _calculateSlidingState(_startAngle, _endAngle);
       if (isSingleHandler) {
-        _laps = _calculateLapsForsSingleHandler(
-            _endAngle, previousEndAngle, _slidingState, _laps);
+        _laps = _calculateLapsForsSingleHandler(_endAngle, previousEndAngle, _slidingState, _laps);
         _slidingState = newSlidingState;
       } else {
         // is double handler
         if (newSlidingState != _slidingState) {
           _laps = _calculateLapsForDoubleHandler(
-              _startAngle,
-              _endAngle,
-              previousStartAngle,
-              previousEndAngle,
-              _slidingState,
-              newSlidingState,
-              _laps);
+              _startAngle, _endAngle, previousStartAngle, previousEndAngle, _slidingState, newSlidingState, _laps);
           _slidingState = newSlidingState;
         }
       }
@@ -188,8 +178,7 @@ class _CircularSliderState extends State<CircularSliderPaint> {
     );
   }
 
-  int _calculateLapsForsSingleHandler(
-      double end, double prevEnd, SlidingState slidingState, int laps) {
+  int _calculateLapsForsSingleHandler(double end, double prevEnd, SlidingState slidingState, int laps) {
     if (slidingState != SlidingState.none) {
       if (radiansWasModuloed(end, prevEnd)) {
         var lapIncrement = end < prevEnd ? 1 : -1;
@@ -200,19 +189,11 @@ class _CircularSliderState extends State<CircularSliderPaint> {
     return laps;
   }
 
-  int _calculateLapsForDoubleHandler(
-      double start,
-      double end,
-      double prevStart,
-      double prevEnd,
-      SlidingState slidingState,
-      SlidingState newSlidingState,
-      int laps) {
+  int _calculateLapsForDoubleHandler(double start, double end, double prevStart, double prevEnd,
+      SlidingState slidingState, SlidingState newSlidingState, int laps) {
     if (slidingState != SlidingState.none) {
-      if (!radiansWasModuloed(start, prevStart) &&
-          !radiansWasModuloed(end, prevEnd)) {
-        var lapIncrement =
-            newSlidingState == SlidingState.endIsBiggerThanStart ? 1 : -1;
+      if (!radiansWasModuloed(start, prevStart) && !radiansWasModuloed(end, prevEnd)) {
+        var lapIncrement = newSlidingState == SlidingState.endIsBiggerThanStart ? 1 : -1;
         var newLaps = laps + lapIncrement;
         return newLaps < 0 ? 0 : newLaps;
       }
@@ -221,9 +202,7 @@ class _CircularSliderState extends State<CircularSliderPaint> {
   }
 
   SlidingState _calculateSlidingState(double start, double end) {
-    return end > start
-        ? SlidingState.endIsBiggerThanStart
-        : SlidingState.endIsSmallerThanStart;
+    return end > start ? SlidingState.endIsBiggerThanStart : SlidingState.endIsSmallerThanStart;
   }
 
   void _onPanUpdate(Offset details) {
@@ -252,11 +231,9 @@ class _CircularSliderState extends State<CircularSliderPaint> {
     var newValue = percentageToValue(percentage, widget.divisions);
 
     if (isBothHandlersSelected) {
-      var newValueInit =
-          (newValue - _differenceFromInitPoint) % widget.divisions;
+      var newValueInit = (newValue - _differenceFromInitPoint) % widget.divisions;
       if (newValueInit != widget.init) {
-        var newValueEnd =
-            (widget.end + (newValueInit - widget.init)) % widget.divisions;
+        var newValueEnd = (widget.end + (newValueInit - widget.init)) % widget.divisions;
         widget.onSelectionChange(newValueInit, newValueEnd, _laps);
         if (isPanEnd) {
           widget.onSelectionEnd(newValueInit, newValueEnd, _laps);
@@ -296,12 +273,10 @@ class _CircularSliderState extends State<CircularSliderPaint> {
         _onPanUpdate(details);
       }
     } else {
-      _isInitHandlerSelected = isPointInsideCircle(
-          position, _painter.initHandler, widget.handlerOutterRadius);
+      _isInitHandlerSelected = isPointInsideCircle(position, _painter.initHandler, widget.handlerOutterRadius);
 
       if (!_isInitHandlerSelected) {
-        _isEndHandlerSelected = isPointInsideCircle(
-            position, _painter.endHandler, widget.handlerOutterRadius);
+        _isEndHandlerSelected = isPointInsideCircle(position, _painter.endHandler, widget.handlerOutterRadius);
       }
 
       if (isNoHandlersSelected) {
@@ -315,9 +290,7 @@ class _CircularSliderState extends State<CircularSliderPaint> {
             var positionPercentage = radiansToPercentage(angle);
 
             // no need to account for negative values, that will be sorted out in the onPanUpdate
-            _differenceFromInitPoint =
-                percentageToValue(positionPercentage, widget.divisions) -
-                    widget.init;
+            _differenceFromInitPoint = percentageToValue(positionPercentage, widget.divisions) - widget.init;
           }
         }
       }

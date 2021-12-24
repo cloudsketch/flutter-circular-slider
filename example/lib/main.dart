@@ -46,11 +46,11 @@ class SleepPage extends StatefulWidget {
 class _SleepPageState extends State<SleepPage> {
   final baseColor = Color.fromRGBO(255, 255, 255, 0.3);
 
-  int initTime;
-  int endTime;
+  int initTime = 0;
+  int endTime = 0;
 
-  int inBedTime;
-  int outBedTime;
+  int inBedTime = 0;
+  int outBedTime = 0;
   int days = 0;
 
   @override
@@ -140,10 +140,7 @@ class _SleepPageState extends State<SleepPage> {
                   Text('${_formatIntervalTime(inBedTime, outBedTime)}',
                       style: TextStyle(fontSize: 36.0, color: Colors.white)),
                   Text('${_formatDays(days)}',
-                      style: TextStyle(
-                          fontSize: 28.0,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic)),
+                      style: TextStyle(fontSize: 28.0, color: Colors.white, fontStyle: FontStyle.italic)),
                 ],
               )),
           shouldCountLaps: true,
